@@ -2,6 +2,8 @@ require "too_done/version"
 require "too_done/init_db"
 require "too_done/user"
 require "too_done/session"
+require "too_done/todo_list"
+require "too_done/task"
 
 require "thor"
 require "pry"
@@ -17,6 +19,13 @@ module TooDone
     def add(task)
       # find or create the right todo list
       # create a new item under that list, with optional date
+      binding.pry
+      list = TodoList.find_or_create_by(user_id: current_user, name: options[:list])
+      list = list[:id]
+      added_task = Task.create(list: list,
+                               due_date: options[:date],
+                               name: task,
+                               completed: false)
     end
 
     desc "edit", "Edit a task from a todo list."
