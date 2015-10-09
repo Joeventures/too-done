@@ -1,5 +1,5 @@
 module TooDone
   class Task < ActiveRecord::Base
-    has_many :todo_lists
+    belongs_to :todo_list
   end
 end

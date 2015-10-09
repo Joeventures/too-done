@@ -20,10 +20,9 @@ module TooDone
       # find or create the right todo list
       # create a new item under that list, with optional date
       binding.pry
-      list = TodoList.find_or_create_by(user_id: current_user, name: options[:list])
-      list = list[:id]
-      added_task = Task.create(list: list,
-                               due_date: options[:date],
+      list = TodoList.find_or_create_by(user_id: current_user.id, name: options[:list])
+      added_task = Task.create(list_id: list.id,
+                               due_date: options[:date], #todo make this a date and optional
                                name: task,
                                completed: false)
     end
