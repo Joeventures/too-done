@@ -99,7 +99,20 @@ module TooDone
       \t\t\t\t\tLimits results to those with a due date."
     def show
       # find or create the right todo list
+      list = TodoList.find_by user_id: current_user.id, name: options[:list]
+      if list == nil
+        puts "Sorry. List not found."
+        exit
+      end
+      tasks = Task.where todo_list_id: list.id, completed: false
+      if tasks == nil
+        puts "Relax. All tasks in this list have been completed."
+        exit
+      end
       # show the tasks ordered as requested, default to reverse order (recently entered first)
+      tasks = tasks.order due_date: :desc 
+      binding.pry
+
     end
 
     desc "delete [LIST OR USER]", "Delete a todo list or a user."
