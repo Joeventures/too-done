@@ -51,10 +51,18 @@ module TooDone
         puts "ID: #{task.id} | Task: #{task.name} | Due: #{due_date}"
       end
       puts "Which task would you like to edit?"
-      edit_this = STDIN.gets.chomp.to_i
-      puts edit_this
-      binding.pry
+      task_id = STDIN.gets.chomp.to_i
       # allow the user to change the title, due date
+      puts "Enter the new title, or leave blank to leave it alone:"
+      new_title = STDIN.gets.chomp
+      puts "Enter the new due date in 'YYYY-MM-DD' format, or leave blank to leave it alone:"
+      new_due_date = STDIN.gets.chomp
+
+      edit_this_task = Task.find(task_id)
+      edit_this_task.name = new_title unless new_title.empty?
+      edit_this_task.due_date = new_due_date unless new_due_date.empty?
+      edit_this_task.save
+      puts "Task updated!"
     end
 
     desc "done", "Mark a task as completed."
