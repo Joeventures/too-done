@@ -14,15 +14,21 @@ module TooDone
     desc "add 'TASK'", "Add a TASK to a todo list."
     option :list, :aliases => :l, :default => "*default*",
       :desc => "The todo list which the task will be filed under."
+    #binding.pry
     option :date, :aliases => :d,
       :desc => "A Due Date in YYYY-MM-DD format."
     def add(task)
       # find or create the right todo list
       # create a new item under that list, with optional date
-      binding.pry
+      #binding.pry
       list = TodoList.find_or_create_by(user_id: current_user.id, name: options[:list])
-      added_task = Task.create(list_id: list.id,
-                               due_date: options[:date], #todo make this a date and optional
+      if options[:date] == nil
+        due_date = DateTime.now
+      else
+        due_date = DateTime.parse options[:date]
+      end
+      added_task = Task.create(todo_list_id: list.id,
+                               due_date: due_date,
                                name: task,
                                completed: false)
     end
