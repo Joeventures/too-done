@@ -134,14 +134,35 @@ module TooDone
         exit
       end
       # find the matching user or list
+      list = TodoList.find_by user_id: current_user.id, name: options[:list] if options[:list]
+      user = User.find_by name: options[:user] if options[:user]
       # BAIL if the user or list couldn't be found
+      unless list || user
+        puts "List or user not found. Mission aborted."
+        exit
+      end
       # delete them (and any dependents)
+      #binding.pry
+      if user
+        lists = TodoList.where(user_id: user.id)
+        lists.each { |list| Task.where(todo_list_id: list.id).delete_all }
+        lists.delete_all
+        User.destroy(user.id)
+        puts user.name + " destroyed!"
+      end
+      if list
+        list_id = list.id
+        Task.where(todo_list_id: list_id).delete_all
+        TodoList.destroy(list_id)
+        puts list.name + " destroyed!"
+      end
     end
 
     desc "switch USER", "Switch session to manage USER's todo lists."
     def switch(username)
       user = User.find_or_create_by(name: username)
       user.sessions.create
+
     end
 
     private
