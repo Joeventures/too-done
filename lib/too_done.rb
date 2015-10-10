@@ -104,25 +104,35 @@ module TooDone
         puts "Sorry. List not found."
         exit
       end
-      tasks = Task.where todo_list_id: list.id, completed: false
+      tasks = Task.where todo_list_id: list.id
+      tasks = tasks.where completed: false unless options[:completed]
       if tasks == nil
-        puts "Relax. All tasks in this list have been completed."
+        puts "Relax. You have no tasks in this list."
         exit
       end
       # show the tasks ordered as requested, default to reverse order (recently entered first)
-      tasks = tasks.order due_date: :desc 
-      binding.pry
-
+      tasks = tasks.order due_date: :desc
+      tasks = tasks.order due_date: :asc if options[:sort] == 'history'
+      tasks = tasks.reject { |task| task.due_date > Date.today } if options[:sort] == 'overdue'
+      tasks.each { |task| puts "ID: #{task.id} | Task: #{task.name} | Due: #{task.due_date}"}
     end
 
     desc "delete [LIST OR USER]", "Delete a todo list or a user."
-    option :list, :aliases => :l, :default => "*default*",
+    option :list, :aliases => :l, # removed the default option -- that just seemed dangerous.
       :desc => "The todo list which will be deleted (including items)."
     option :user, :aliases => :u,
       :desc => "The user which will be deleted (including lists and items)."
     def delete
       # BAIL if both list and user options are provided
+      if options[:list] && options[:user]
+        puts "You can delete a list *OR* a user. Not both."
+        exit
+      end
       # BAIL if neither list or user option is provided
+      unless options[:list] || options[:user]
+        puts "You must provide an option."
+        exit
+      end
       # find the matching user or list
       # BAIL if the user or list couldn't be found
       # delete them (and any dependents)
