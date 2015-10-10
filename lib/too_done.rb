@@ -70,8 +70,23 @@ module TooDone
       :desc => "The todo list whose tasks will be completed."
     def done
       # find the right todo list
+      list = TodoList.find_by user_id: current_user.id, name: options[:list]
       # BAIL if it doesn't exist and have tasks
+      if list == nil
+        puts "Sorry. List not found."
+        exit
+      end
       # display the tasks and prompt for which one(s?) to mark done
+      tasks = Task.where todo_list_id: list.id, completed: false
+      tasks.each do |task|
+        due_date = task.due_date.strftime unless task.due_date == nil
+        puts "ID: #{task.id} | Task: #{task.name} | Due: #{due_date}"
+      end
+      puts "Which task would you like to mark as completed?"
+      task_id = STDIN.gets.chomp.to_i
+      done_this_task = Task.find(task_id)
+      done_this_task.update completed: true
+      puts "You're done!"
     end
 
     desc "show", "Show the tasks on a todo list in reverse order."
