@@ -20,7 +20,6 @@ module TooDone
     def add(task)
       # find or create the right todo list
       # create a new item under that list, with optional date
-      #binding.pry
       list = TodoList.find_or_create_by(user_id: current_user.id, name: options[:list])
       if options[:date] == nil
         due_date = DateTime.now
@@ -38,8 +37,23 @@ module TooDone
       :desc => "The todo list whose tasks will be edited."
     def edit
       # find the right todo list
+      list = TodoList.find_by user_id: current_user.id, name: options[:list]
       # BAIL if it doesn't exist and have tasks
+      if list == nil
+        puts "Sorry. List not found."
+        exit
+      end
       # display the tasks and prompt for which one to edit
+      tasks = Task.where todo_list_id: list.id, completed: false
+      tasks.each do |task|
+        #binding.pry
+        due_date = task.due_date.strftime unless task.due_date == nil
+        puts "ID: #{task.id} | Task: #{task.name} | Due: #{due_date}"
+      end
+      puts "Which task would you like to edit?"
+      edit_this = STDIN.gets.chomp.to_i
+      puts edit_this
+      binding.pry
       # allow the user to change the title, due date
     end
 
